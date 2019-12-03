@@ -14,5 +14,24 @@
 
 
 
+@property (weak, nonatomic) IBOutlet UILabel *labelValueNumAdRequest;
+@property (weak, nonatomic) IBOutlet UILabel *labelValueNumAdFilled;
+@property (weak, nonatomic) IBOutlet UILabel *labelValueNumAdError;
+@property (weak, nonatomic) IBOutlet UILabel *labelValueNumAdShown;
+@property (weak, nonatomic) IBOutlet UILabel *labelValueNumClientTimeout;
+@property (weak, nonatomic) IBOutlet UILabel *labelValueAverageAuctionTime;
+
+@property (weak, nonatomic) IBOutlet UILabel *labelValueCurrentAuctionWinner;
+@property (weak, nonatomic) IBOutlet UILabel *labelValueCurrentAuctionWinPrice;
+@property (weak, nonatomic) IBOutlet UILabel *labelValueCurrentAuctionShown;
+@property (weak, nonatomic) IBOutlet UILabel *labelValueCurrentAuctionPrice;
+@property (weak, nonatomic) IBOutlet UILabel *labelValueCurrentImpressionFrom;
+@property (weak, nonatomic) IBOutlet UILabel *labelValueThisAuctionTime;
+
+
+// To implement later
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *adLoadSActivityIndicator;
+@property (weak, nonatomic) IBOutlet UIProgressView *adLoadStepIndicator;
+
 @end
 

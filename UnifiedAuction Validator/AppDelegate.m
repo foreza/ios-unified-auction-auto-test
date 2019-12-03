@@ -19,8 +19,8 @@
     // Override point for customization after application launch.
     
     // Initialize the SDK
-//    [AerServSDK initializeWithAppID:@"1022221" andGDPRUserConsent:true];
-    [AerServSDK initializeWithAppID:@"380000" andGDPRUserConsent:false];
+    [AerServSDK initializeWithAppID:@"1022221" andGDPRUserConsent:true];
+//    [AerServSDK initializeWithAppID:@"380000" andGDPRUserConsent:false];
     
     return YES;
 }
