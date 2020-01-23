@@ -8,7 +8,7 @@
 
 #import "ViewController.h"
 
-@interface ViewController () <ASInterstitialViewControllerDelegate>
+@interface ViewController () <ASInterstitialViewControllerDelegate, ASAdViewDelegate, IMInterstitialDelegate>
 
 
 
@@ -17,16 +17,27 @@
 @implementation ViewController
 
 
+    NSMutableData *_responseData;               // Response data from the delegate (not being used)
+    NSString * baseApiURL = @"http://107.170.192.117:8900/api/session/";
+
+
     // Test Variables
 
-    ASInterstitialViewController* interVC;          // Interstitial view controller
-    NSString * plc = @"1069520";                     // AerServ placement ID
-//    NSString * plc = @"380003";                     // Sample placement ID
+     ASInterstitialViewController* interVC;          // Interstitial view controller
+
+//    NSString * plc = @"1069520";                   // [Int] SE test placement ID for mirror
+//    NSString * plc = @"1070080";                   // [Int] focus test smaato / dsui adline
+    NSString * plc = @"1067688";                     // [Int] MSFT iOS int placement
+//    NSString * plc = @"380003";                    // [Int] Sample VAST placement ID
+
+    ASAdView* bannerView;                           // Banner ad view
+
+    NSString * bPLC = @"1067944";                   // MSFT iOS MREC placement
 
     
     NSInteger globalRequestTimeout = 5;            // Once this timeout is reached, we'll terminate the request if an impression is not yet fired.
-    NSInteger timeBeforeNextRequest = 15;           // We'll wait this amount of time before firing off another request
-    NSInteger timeForAdOnScreen = 10;               // Amount of time we'll allow an ad to be on screen before we ask for another one.
+    NSInteger timeBeforeNextRequest = 35;       // We'll wait this amount of time before firing off another request
+    NSInteger timeForAdOnScreen = 15;               // Amount of time we'll allow an ad to be on screen before we ask for another one.
 
     bool adRequestInProgress = false;               // Track the status of the ad request
     bool hasInterstitialImpression = false;         // Track the impression
@@ -40,47 +51,142 @@
     NSInteger numAdShown;                       // Track the number of attempts
     NSInteger numClientSideTimeout;             // Track the number of client timeouts
     NSInteger numAdError;                       // Track the number of errors (todo: move this into the dictionary)
+    NSInteger numInternalError;
+    NSInteger numConnectionError;
     NSInteger numAvgAuctionTime;                // Keep a running total of average auction time (to implement)
         
-    NSDictionary *errorDictonary;               // TODO: Implement
-
-//    = @{
-//           @"noFill" : @0,
-//        @"internalError" : @0,
-//        @"timeout" : @0
-//    };
-//
-
-
-
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    [self createAndBeginLoadingInterstitial];
+//    [self createAndBeginLoadingInterstitial];
+//    [self createAndLoadMREC];
     
 }
 
 - (IBAction)onTouchBeginTest:(id)sender {
     
-     [self createAndBeginLoadingInterstitial];
+//     [self createAndBeginLoadingInterstitial];
+    
+    [self fireMetricWithTime:@"999.0"];
 
-    NSLog(@"--------- InterstitialVC, onTouchBeginTest");
-
+//    NSLog(@"--------- InterstitialVC, onTouchBeginTest");
     
 }
+
+- (void) fireMetricWithTime:(NSString* )timeElapsed{
+
+    NSDictionary *jsonBodyDict = @{
+        @"request_totalTimeElapsed":timeElapsed,
+        @"device_name":@"ios 7+ jason desk",
+        @"device_ip": @"some US IP",
+        @"device_platform":@"iOS",
+        @"ad_request_geo":@"USA",
+        @"ad_delivery_status": @YES
+    };
+    
+    // Serialize the data in the request
+    NSData *jsonBodyData = [NSJSONSerialization dataWithJSONObject:jsonBodyDict options:kNilOptions error:nil];
+    
+    // Create the request
+    NSURL *url = [NSURL URLWithString:baseApiURL];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    
+    [request setHTTPMethod:@"POST"];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+//    [request setValue:[NSString stringWithFormat:@"%d", [jsonBodyData length]] forHTTPHeaderField:@"Content-Length"];
+    [request setHTTPBody: jsonBodyData];
+        
+    // Create url connection and fire request.
+    // TODO: Update this since we're using a deprecated method
+    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    
+
+    // watch out: error is nil here, but you never do that in production code. Do proper checks!
+    
+}
+
+
+#pragma mark NSURLConnection Delegate Methods
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    
+    _responseData = [[NSMutableData alloc] init];
+        
+    NSLog(@"NSURLConnection didReceiveResponse from: %@", response.URL.absoluteString);
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    // Append the new data to the instance variable you declared
+    
+    // Note: connection:didReceiveData: will be hit several times
+    
+    [_responseData appendData:data];
+    
+    NSLog(@"NSURLConnection didReceiveData with length: %lu", (unsigned long)data.length);
+}
+
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection
+                  willCacheResponse:(NSCachedURLResponse*)cachedResponse {
+    // Return nil to indicate not necessary to store a cached response for this connection
+    
+    return nil;
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    // The request is complete and data has been received
+    // You can parse the stuff in your instance variable now
+    
+    NSLog(@"NSURLConnection connectionDidFinishLoading");
+}
+
+
+// TODO: show something if it errors
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error{
+    // The request has failed for some reason!
+    // Check the error var
+    }
+
+
+
 
 
 - (void) createAndBeginLoadingInterstitial {
     
     // Create ASInterstitial VC
     interVC = [ASInterstitialViewController viewControllerForPlacementID:plc withDelegate:self];
+
     
     // Load the interstitial 5 seconds later
     [self delayedSubmitInterstitialRequest:5];
 
 }
+
+- (void) createAndLoadMREC {
+    
+    // Create  banner view
+    bannerView = [ASAdView viewWithPlacementID:bPLC
+                                                   asAdSize:CGSizeMake(300.0f, 250.0f)
+                                                andDelegate:self];
+       
+       bannerView.isPreload = false;
+       bannerView.delegate = self;
+       bannerView.bannerRefreshTimeInterval = 30.0f;
+    
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+          
+          NSLog(@"--------- InterstitialVC, delayedSubmitInterstitialRequest now running!");
+        
+        [bannerView loadAd];
+        [self.view addSubview:bannerView];
+        
+    });
+    
+}
+
 
 
 - (void) delayedSubmitInterstitialRequest:(unsigned long long)time {
@@ -124,9 +230,21 @@
             [self view_updateAllStats];
             
             [vc cancel];
+            
+            // Load another interstitial a couple seconds later, just to be safe.
+            [self delayedSubmitInterstitialRequest:timeBeforeNextRequest];
                         
         } else {
-            NSLog(@"--------- InterstitialVC, do NOT timeout since we have an impression after: %lld", time);
+            
+            if (!hasInterstitialImpression) {
+                 NSLog(@"--------- InterstitialVC, do NOT timeout since we have an impression after: %lld", time);
+            }
+            
+            if (adRequestInProgress) {
+                 NSLog(@"--------- InterstitialVC, ad request is still in progress! %lld", time);
+            }
+            
+    
         }
         
     });
@@ -181,16 +299,82 @@
 
 
 
+// IMInterstitialDelegate & GADInterstitialDelegate
+- (void)interstitialDidReceiveAd:(id)interstitial {
+    NSLog(@"--------- InterstitialVC, interstitialDidReceiveAd:");
+}
+
+// IMInterstitialDelegate
+- (void)interstitialDidFinishLoading:(IMInterstitial*)interstitial {
+    NSLog(@"--------- InterstitialVC, interstitialDidFinishLoading:");
+  
+}
+
+// IMInterstitialDelegate
+- (void)interstitial:(IMInterstitial*)interstitial didFailToLoadWithError:(IMRequestStatus*)error {
+    NSLog(@"--------- InterstitialVC, interstitial:didFailToLoadWithError: - error: %@", error.description);
+
+}
+
+// IMInterstitialDelegate
+- (void)interstitialWillPresent:(IMInterstitial*)interstitial {
+    NSLog(@"--------- InterstitialVC, interstitialWillPresent:");
+
+}
+
+// IMInterstitialDelegate
+- (void)interstitialDidPresent:(IMInterstitial*)interstitial {
+    NSLog(@"--------- InterstitialVC, interstitialDidPresent:");
+}
+
+// IMInterstitialDelegate
+- (void)interstitial:(IMInterstitial*)interstitial didFailToPresentWithError:(IMRequestStatus*)error {
+    NSLog(@"--------- InterstitialVC, interstitial:didFailToPresentWithError: - error: %@", error);
+}
+
+// IMInterstitialDelegate
+- (void)interstitialWillDismiss:(IMInterstitial*)interstitial {
+    NSLog(@"--------- InterstitialVC, interstitialWillDismiss:");
+}
+
+// IMInterstitialDelegate
+- (void)interstitialDidDismiss:(IMInterstitial*)interstitial {
+    NSLog(@"--------- InterstitialVC, interstitialDidDismiss:");
+
+}
+
+// IMInterstitialDelegate
+- (void)interstitial:(IMInterstitial*)interstitial didInteractWithParams:(NSDictionary*)params {
+    NSLog(@"--------- InterstitialVC, interstitial:didInteractWithParams: - params: %@", params);
+}
+
+// IMInterstitialDelegate
+- (void)interstitial:(IMInterstitial*)interstitial rewardActionCompletedWithRewards:(NSDictionary*)rewards {
+    NSLog(@"--------- InterstitialVC, interstitial:rewardActionCompletedWithRewards: - rewards: %@", rewards);
+}
+
+// IMInterstitialDelegate
+- (void)userWillLeaveApplicationFromInterstitial:(IMInterstitial*)interstitial {
+    NSLog(@"--------- InterstitialVC, userWillLeaveApplicationFromInterstitial:");
+}
+
+
+
+
 #pragma mark - ASInterstitialViewControllerDelegate Protocol Methods
 
 - (void)interstitialViewControllerAdFailedToLoad:(ASInterstitialViewController*)viewController withError:(NSError*)error {
-    NSLog(@"--------- InterstitialVC, interstitialViewControllerAdFailedToLoad:withError: -- error: %@", error.localizedDescription);
+    NSLog(@"--------- InterstitialVC, interstitialViewControllerAdFailedToLoad:withError: -- error: %ld", (long)error.code);
+    
+    NSLog(@"--------- InterstitialVC, interstitialViewControllerAdFailedToLoad:withError: -- error:", error);
+    
+    
     
     // We're done with the ad request
     adRequestInProgress = false;
-    
+        
     // Update # of errors and update view
-    [self stat_incrementNumAdErrors];
+    [self stat_incrementNumAdErrorsForError:error.code];
     [self view_updateAllStats];
     
     [self delayedSubmitInterstitialRequest:timeBeforeNextRequest];
@@ -285,6 +469,104 @@
 
 
 
+
+
+#pragma mark - ASAdViewDelegate / MPADdViewDelegate Protocol Methods
+
+// ASAdViewDelegate & MPAdViewDelegate Overloaded
+- (UIViewController*)viewControllerForPresentingModalView {
+    return self;
+}
+
+// ASAdViewDelegate & MPAdViewDelegate Overloaded
+- (void)adViewDidLoadAd:(id)adView {
+    if([adView isKindOfClass:[ASAdView class]]) {
+        NSLog(@"-------- ASBannerCallback: adViewDidLoadAd:");
+        ASAdView* asAdView = adView;
+        asAdView.center = self.view.center;
+        
+        [self stat_incrementNumAdFilled];
+        [self view_updateAllStats];
+        
+    }
+}
+// ASAdViewDelegate
+- (void)adViewDidFailToLoadAd:(ASAdView*)adView withError:(NSError*)error {
+    NSLog(@"-------- ASBannerCallback: adViewDidFailToLoadAd:withError: - error: %@", error.description);
+    
+    [self stat_incrementNumAdErrorsForError:error.code];
+    [self view_updateAllStats];
+    
+}
+
+// ASAdViewDelegate
+- (void)adViewDidPreloadAd:(ASAdView*)adView {
+    NSLog(@"-------- ASBannerCallback: adViewDidPreloadAd:");
+}
+
+// ASAdViewDelegate
+- (void)adViewAdImpression:(ASAdView*)adView {
+    NSLog(@"-------- ASBannerCallback: adViewAdImpression:");
+    
+  
+    
+}
+
+// ASAdViewDelegate & MPAdViewDelegate Overloaded
+- (void)willPresentModalViewForAd:(id)adView {
+    if([adView isKindOfClass:[ASAdView class]]) {
+        NSLog(@"-------- ASBannerCallback: willPresentModalViewForAd:");
+    }
+}
+
+// ASAdViewDelegate & MPAdViewDelegate Overloaded
+- (void)didDismissModalViewForAd:(id)adView {
+    if([adView isKindOfClass:[ASAdView class]]) {
+        NSLog(@"-------- ASBannerCallback: didDismissModalViewForAd:");
+    }
+}
+
+// ASAdViewDelegate & MPAdViewDelegate Overloaded
+- (void)willLeaveApplicationFromAd:(id)adView {
+    if([adView isKindOfClass:[ASAdView class]]) {
+        NSLog(@"-------- ASBannerCallback: willLeaveApplicationFromAd:");
+    }
+}
+
+// ASAdViewDelegate
+- (void)adViewDidCompletePlayingWithVastAd:(ASAdView*)adView {
+    NSLog(@"-------- ASBannerCallback: adViewDidCompletePlayingWithVastAd:");
+}
+
+// ASAdViewDelegate
+- (void)adWasClicked:(ASAdView*)adView {
+    NSLog(@"-------- ASBannerCallback: adWasClicked:");
+}
+
+// ASAdViewDelegate
+- (void)adView:(ASAdView*)adView didLoadAdWithTransactionInfo:(NSDictionary*)transactionInfo {
+    NSLog(@"-------- ASBannerCallback: adView:didLoadAdWithTransactionInfo: %@", transactionInfo);
+    
+    [self stat_incrementNumAdFilled];
+    [self view_updateAllStats];
+    
+}
+
+// ASAdViewDelegate
+- (void)adView:(ASAdView*)adView didShowAdWithTransactionInfo:(NSDictionary*)transcationInfo {
+    NSLog(@"-------- ASBannerCallback: adView:didShowAdWithTransactionInfo: %@", transcationInfo);
+    
+    [self stat_incrementNumAdShown];
+      [self view_updateAllStats];
+    
+}
+
+
+
+
+
+
+
 #pragma mark - Statistical get/set Methods
 
 - (void) stat_incrementNumAdAttempts{
@@ -301,9 +583,23 @@
 }
 
 
-- (void) stat_incrementNumAdErrors{
+- (void) stat_incrementNumAdErrorsForError:(NSInteger) errCode{
     numAdError++;
     NSLog(@"--------- stat_incrementNumAdErrors: %li", numAdError);
+    
+    if (errCode == 1){
+        numInternalError++;
+        NSLog(@"--------- stat_incrementNumAdErrors for err 1: %li", numInternalError);
+        
+    }
+    
+    if (errCode == 11){
+        numConnectionError++;
+        NSLog(@"--------- stat_incrementNumAdErrors for err 11: %li", numConnectionError);
+        
+        
+    }
+    
     [self view_updateAllStats];
 
 }
@@ -365,6 +661,8 @@
     NSLog(@"--------- Number of Ad Errors: %li", numAdError);
     NSLog(@"--------- Number of Ad Shown: %li", numAdShown);
     NSLog(@"--------- Number of Client timeout: %li", numClientSideTimeout);
+     NSLog(@"--------- Number of Connection err: %li", numConnectionError);
+     NSLog(@"--------- Number of Internal err: %li", numInternalError);
 
 }
 
@@ -389,9 +687,12 @@
     [self.labelValueNumAdError setText:[NSString stringWithFormat:@"%ld",numAdError]];
     [self.labelValueNumAdShown setText:[NSString stringWithFormat:@"%ld",numAdShown]];
     [self.labelValueNumClientTimeout setText:[NSString stringWithFormat:@"%ld",numClientSideTimeout]];
-    // [self.labelValueNumClientTimeout setText:[NSString stringWithFormat:@"TODO"]];
-
+    [self.labelValueInternalErrorCount setText:[NSString stringWithFormat:@"%ld",numInternalError]];
+    [self.labelValueConnectionErrorCount setText:[NSString stringWithFormat:@"%ld",numConnectionError]];
+    
 }
+
+
 
 
 

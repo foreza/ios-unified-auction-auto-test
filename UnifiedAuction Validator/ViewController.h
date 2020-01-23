@@ -12,8 +12,6 @@
 
 @interface ViewController : UIViewController
 
-
-
 @property (weak, nonatomic) IBOutlet UILabel *labelValueNumAdRequest;
 @property (weak, nonatomic) IBOutlet UILabel *labelValueNumAdFilled;
 @property (weak, nonatomic) IBOutlet UILabel *labelValueNumAdError;
@@ -28,6 +26,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelValueCurrentImpressionFrom;
 @property (weak, nonatomic) IBOutlet UILabel *labelValueThisAuctionTime;
 
+@property (weak, nonatomic) IBOutlet UILabel *labelValueInternalErrorCount;
+@property (weak, nonatomic) IBOutlet UILabel *labelValueConnectionErrorCount;
 
 // To implement later
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *adLoadSActivityIndicator;
