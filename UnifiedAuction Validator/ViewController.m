@@ -54,24 +54,26 @@
     NSInteger numInternalError;
     NSInteger numConnectionError;
     NSInteger numAvgAuctionTime;                // Keep a running total of average auction time (to implement)
+
+    long long timeAdReqBegin;
+    long long timeAdReqEnd;
+    long long timeElapsed;
         
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-//    [self createAndBeginLoadingInterstitial];
+    [self createAndBeginLoadingInterstitial];
 //    [self createAndLoadMREC];
     
 }
 
 - (IBAction)onTouchBeginTest:(id)sender {
     
-//     [self createAndBeginLoadingInterstitial];
+     [self createAndBeginLoadingInterstitial];
     
-    [self fireMetricWithTime:@"999.0"];
-
-//    NSLog(@"--------- InterstitialVC, onTouchBeginTest");
+    NSLog(@"--------- InterstitialVC, onTouchBeginTest");
     
 }
 
@@ -188,6 +190,28 @@
 }
 
 
+- (void) beginTrackingTime {
+    
+    timeAdReqBegin = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
+    NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqBegin, @" begin tracking time!"];
+    NSLog(@"%@", timeTrackingString);
+
+}
+
+
+- (NSString*) endTrackingTimeAndReturnValueForSend {
+
+    timeAdReqEnd = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
+    NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqEnd, @" end tracking time!"];
+    
+    timeElapsed = (timeAdReqEnd - timeAdReqBegin);
+    double formatTimeToSend = (double)timeElapsed;
+    NSString *totalTimeString = [NSString stringWithFormat:@"%f" , formatTimeToSend/1000.0];
+    NSLog(@"%@", timeTrackingString);
+    
+    return totalTimeString;
+}
+
 
 - (void) delayedSubmitInterstitialRequest:(unsigned long long)time {
     
@@ -198,7 +222,7 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, time * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         
         NSLog(@"--------- InterstitialVC, delayedSubmitInterstitialRequest now running!");
-    
+        [self beginTrackingTime];
         
         // Load the interstitial VC
         [interVC loadAd];
@@ -302,6 +326,10 @@
 // IMInterstitialDelegate & GADInterstitialDelegate
 - (void)interstitialDidReceiveAd:(id)interstitial {
     NSLog(@"--------- InterstitialVC, interstitialDidReceiveAd:");
+    
+
+
+    
 }
 
 // IMInterstitialDelegate
@@ -400,6 +428,10 @@
 
 - (void)interstitialViewController:(ASInterstitialViewController*)viewController didLoadAdWithTransactionInfo:(NSDictionary*)transactionInfo {
     NSLog(@"--------- InterstitialVC, interstitialViewController:didLoadAdWithTransactionInfo: - transactionInfo: %@", transactionInfo);
+    
+    
+    // Fire metric and send value
+    [self fireMetricWithTime:[self endTrackingTimeAndReturnValueForSend]];
     
     // Update # of ads filled and update view
     
