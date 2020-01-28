@@ -77,13 +77,16 @@
     
 }
 
-- (void) fireMetricWithTime:(NSString* )timeElapsed{
+- (void) fireMetricWithTime:(NSString* )timeElapsed andStart:(NSString* ) startTime andEnd:(NSString*) endTime forPlacement:(NSString* ) plc{
 
     NSDictionary *jsonBodyDict = @{
+        @"request_startTime":startTime,
+        @"request_endTime":endTime,
         @"request_totalTimeElapsed":timeElapsed,
-        @"device_name":@"ios 7+ jason desk",
+        @"device_name":@"ios 7+ jason's nice desk",
         @"device_ip": @"some US IP",
         @"device_platform":@"iOS",
+        @"ad_request_placement":plc,
         @"ad_request_geo":@"USA",
         @"ad_delivery_status": @YES
     };
@@ -98,7 +101,6 @@
     [request setHTTPMethod:@"POST"];
     [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-//    [request setValue:[NSString stringWithFormat:@"%d", [jsonBodyData length]] forHTTPHeaderField:@"Content-Length"];
     [request setHTTPBody: jsonBodyData];
         
     // Create url connection and fire request.
@@ -190,24 +192,38 @@
 }
 
 
-- (void) beginTrackingTime {
-    
+- (void) setStartingMetricTime {
     timeAdReqBegin = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
     NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqBegin, @" begin tracking time!"];
     NSLog(@"%@", timeTrackingString);
+}
 
+- (void) setEndMetricTime {
+    timeAdReqEnd = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
+    NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqEnd, @" end tracking time!"];
+    NSLog(@"%@", timeTrackingString);
+}
+
+- (NSString*) returnStartingMetricTime{
+    double formatTimeToUse = (double)timeAdReqBegin;
+    NSString *timeString = [NSString stringWithFormat:@"%f" , formatTimeToUse/1000.0];
+    return timeString;
 }
 
 
-- (NSString*) endTrackingTimeAndReturnValueForSend {
+- (NSString*) returnEndMetricTime{
+    double formatTimeToUse = (double)timeAdReqEnd;
+    NSString *timeString = [NSString stringWithFormat:@"%f" , formatTimeToUse/1000.0];
+    return timeString;
+}
 
-    timeAdReqEnd = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
-    NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqEnd, @" end tracking time!"];
+
+- (NSString*) calculateTrackingTimeAndReturnValueForSendWithStart:(long long)start WithEnd:(long long) end  {
     
-    timeElapsed = (timeAdReqEnd - timeAdReqBegin);
+    timeElapsed = (end - start);
     double formatTimeToSend = (double)timeElapsed;
     NSString *totalTimeString = [NSString stringWithFormat:@"%f" , formatTimeToSend/1000.0];
-    NSLog(@"%@", timeTrackingString);
+    NSLog(@"%@", totalTimeString);
     
     return totalTimeString;
 }
@@ -222,7 +238,7 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, time * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         
         NSLog(@"--------- InterstitialVC, delayedSubmitInterstitialRequest now running!");
-        [self beginTrackingTime];
+        [self setStartingMetricTime];
         
         // Load the interstitial VC
         [interVC loadAd];
@@ -431,7 +447,9 @@
     
     
     // Fire metric and send value
-    [self fireMetricWithTime:[self endTrackingTimeAndReturnValueForSend]];
+    [self setEndMetricTime];
+    
+    [self fireMetricWithTime:[self calculateTrackingTimeAndReturnValueForSendWithStart:timeAdReqBegin WithEnd:timeAdReqEnd] andStart:[self returnStartingMetricTime] andEnd:[self returnEndMetricTime] forPlacement:plc];
     
     // Update # of ads filled and update view
     

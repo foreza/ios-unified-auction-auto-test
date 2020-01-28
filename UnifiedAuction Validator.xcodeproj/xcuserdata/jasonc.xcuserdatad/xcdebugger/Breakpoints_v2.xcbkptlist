@@ -14,8 +14,8 @@
             filePath = "UnifiedAuction Validator/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "645"
-            endingLineNumber = "645"
+            startingLineNumber = "663"
+            endingLineNumber = "663"
             landmarkName = "ViewController"
             landmarkType = "3">
          </BreakpointContent>
@@ -30,8 +30,8 @@
             filePath = "UnifiedAuction Validator/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "654"
-            endingLineNumber = "654"
+            startingLineNumber = "672"
+            endingLineNumber = "672"
             landmarkName = "-stat_recalculateAverageAuctionTime"
             landmarkType = "7">
          </BreakpointContent>
@@ -46,8 +46,8 @@
             filePath = "UnifiedAuction Validator/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "449"
-            endingLineNumber = "449"
+            startingLineNumber = "467"
+            endingLineNumber = "467"
             landmarkName = "-interstitialViewController:didShowAdWithTransactionInfo:"
             landmarkType = "7">
          </BreakpointContent>
@@ -62,8 +62,8 @@
             filePath = "UnifiedAuction Validator/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "455"
-            endingLineNumber = "455"
+            startingLineNumber = "473"
+            endingLineNumber = "473"
             landmarkName = "-interstitialViewController:didShowAdWithTransactionInfo:"
             landmarkType = "7">
          </BreakpointContent>
@@ -78,8 +78,8 @@
             filePath = "UnifiedAuction Validator/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "619"
-            endingLineNumber = "619"
+            startingLineNumber = "637"
+            endingLineNumber = "637"
             landmarkName = "-stat_incrementNumAdErrorsForError:"
             landmarkType = "7">
          </BreakpointContent>
@@ -95,8 +95,8 @@
             filePath = "UnifiedAuction Validator/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "528"
-            endingLineNumber = "528"
+            startingLineNumber = "546"
+            endingLineNumber = "546"
             landmarkName = "-adViewDidFailToLoadAd:withError:"
             landmarkType = "7">
          </BreakpointContent>
@@ -111,8 +111,8 @@
             filePath = "UnifiedAuction Validator/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "342"
-            endingLineNumber = "342"
+            startingLineNumber = "358"
+            endingLineNumber = "358"
             landmarkName = "-interstitial:didFailToLoadWithError:"
             landmarkType = "7">
          </BreakpointContent>
@@ -127,8 +127,8 @@
             filePath = "UnifiedAuction Validator/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "394"
-            endingLineNumber = "394"
+            startingLineNumber = "410"
+            endingLineNumber = "410"
             landmarkName = "-interstitialViewControllerAdFailedToLoad:withError:"
             landmarkType = "7">
          </BreakpointContent>
@@ -143,8 +143,8 @@
             filePath = "UnifiedAuction Validator/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "397"
-            endingLineNumber = "397"
+            startingLineNumber = "413"
+            endingLineNumber = "413"
             landmarkName = "-interstitialViewControllerAdFailedToLoad:withError:"
             landmarkType = "7">
          </BreakpointContent>
