@@ -39,38 +39,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "507C22C5-FF1C-48C0-A13B-7543D18A0DA0"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "UnifiedAuction Validator/ViewController.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "467"
-            endingLineNumber = "467"
-            landmarkName = "-interstitialViewController:didShowAdWithTransactionInfo:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "3989D87F-3CEE-43D3-AAAB-77051D3681BE"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "UnifiedAuction Validator/ViewController.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "473"
-            endingLineNumber = "473"
-            landmarkName = "-interstitialViewController:didShowAdWithTransactionInfo:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "56523E8B-E396-4DEF-99AB-B0A939A443CC"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -87,39 +55,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "D1CD7A88-8FC6-4DAD-A769-0632F429A679"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            condition = "error.code != 100"
-            continueAfterRunningActions = "No"
-            filePath = "UnifiedAuction Validator/ViewController.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "546"
-            endingLineNumber = "546"
-            landmarkName = "-adViewDidFailToLoadAd:withError:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "BF7C8FA8-9631-49CA-88C7-58B6269A0739"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "UnifiedAuction Validator/ViewController.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "358"
-            endingLineNumber = "358"
-            landmarkName = "-interstitial:didFailToLoadWithError:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "64F49220-1BFB-4BB3-9204-0C18883C9205"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -129,22 +64,6 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "410"
             endingLineNumber = "410"
-            landmarkName = "-interstitialViewControllerAdFailedToLoad:withError:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "3BC3BEEE-C01A-4400-92B3-E2B9F9B7C0F5"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "UnifiedAuction Validator/ViewController.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "413"
-            endingLineNumber = "413"
             landmarkName = "-interstitialViewControllerAdFailedToLoad:withError:"
             landmarkType = "7">
          </BreakpointContent>

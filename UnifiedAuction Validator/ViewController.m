@@ -8,9 +8,7 @@
 
 #import "ViewController.h"
 
-@interface ViewController () <ASInterstitialViewControllerDelegate, ASAdViewDelegate, IMInterstitialDelegate>
-
-
+@interface ViewController () <ASInterstitialViewControllerDelegate, ASAdViewDelegate>
 
 @end
 
@@ -36,7 +34,7 @@
 
     
     NSInteger globalRequestTimeout = 5;            // Once this timeout is reached, we'll terminate the request if an impression is not yet fired.
-    NSInteger timeBeforeNextRequest = 35;       // We'll wait this amount of time before firing off another request
+    NSInteger timeBeforeNextRequest = 35;           // We'll wait this amount of time before firing off another request
     NSInteger timeForAdOnScreen = 15;               // Amount of time we'll allow an ad to be on screen before we ask for another one.
 
     bool adRequestInProgress = false;               // Track the status of the ad request
@@ -54,7 +52,8 @@
     NSInteger numInternalError;
     NSInteger numConnectionError;
     NSInteger numAvgAuctionTime;                // Keep a running total of average auction time (to implement)
-
+    
+    // Timing Tests
     long long timeAdReqBegin;
     long long timeAdReqEnd;
     long long timeElapsed;
@@ -76,6 +75,46 @@
     NSLog(@"--------- InterstitialVC, onTouchBeginTest");
     
 }
+
+
+#pragma mark Metric Section
+
+- (void) setStartingMetricTime {
+    timeAdReqBegin = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
+    NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqBegin, @" begin tracking time!"];
+    NSLog(@"%@", timeTrackingString);
+}
+
+- (void) setEndMetricTime {
+    timeAdReqEnd = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
+    NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqEnd, @" end tracking time!"];
+    NSLog(@"%@", timeTrackingString);
+}
+
+
+- (NSString*) returnStartingMetricTime{
+    double formatTimeToUse = (double)timeAdReqBegin;
+    NSString *timeString = [NSString stringWithFormat:@"%f" , formatTimeToUse/1000.0];
+    return timeString;
+}
+
+
+- (NSString*) returnEndMetricTime{
+    double formatTimeToUse = (double)timeAdReqEnd;
+    NSString *timeString = [NSString stringWithFormat:@"%f" , formatTimeToUse/1000.0];
+    return timeString;
+}
+
+
+- (NSString*) calculateTrackingTimeAndReturnValueForSendWithStart:(long long)start WithEnd:(long long) end  {
+    timeElapsed = (end - start);
+    double formatTimeToSend = (double)timeElapsed;
+    NSString *totalTimeString = [NSString stringWithFormat:@"%f" , formatTimeToSend/1000.0];
+    NSLog(@"%@", totalTimeString);
+    
+    return totalTimeString;
+}
+
 
 - (void) fireMetricWithTime:(NSString* )timeElapsed andStart:(NSString* ) startTime andEnd:(NSString*) endTime forPlacement:(NSString* ) plc{
 
@@ -106,55 +145,43 @@
     // Create url connection and fire request.
     // TODO: Update this since we're using a deprecated method
     NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-    
-
-    // watch out: error is nil here, but you never do that in production code. Do proper checks!
-    
+        
 }
 
 
 #pragma mark NSURLConnection Delegate Methods
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    
-    _responseData = [[NSMutableData alloc] init];
-        
     NSLog(@"NSURLConnection didReceiveResponse from: %@", response.URL.absoluteString);
+    _responseData = [[NSMutableData alloc] init];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    // Append the new data to the instance variable you declared
-    
-    // Note: connection:didReceiveData: will be hit several times
-    
-    [_responseData appendData:data];
-    
     NSLog(@"NSURLConnection didReceiveData with length: %lu", (unsigned long)data.length);
+    [_responseData appendData:data];
 }
+
 
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection
                   willCacheResponse:(NSCachedURLResponse*)cachedResponse {
-    // Return nil to indicate not necessary to store a cached response for this connection
-    
     return nil;
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     // The request is complete and data has been received
     // You can parse the stuff in your instance variable now
-    
     NSLog(@"NSURLConnection connectionDidFinishLoading");
 }
 
 
 // TODO: show something if it errors
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error{
-    // The request has failed for some reason!
-    // Check the error var
+    // The request has failed for some reason! Check the error var
     }
 
 
 
+#pragma mark Ad Test Control Methods
 
 
 - (void) createAndBeginLoadingInterstitial {
@@ -162,29 +189,30 @@
     // Create ASInterstitial VC
     interVC = [ASInterstitialViewController viewControllerForPlacementID:plc withDelegate:self];
 
-    
     // Load the interstitial 5 seconds later
-    [self delayedSubmitInterstitialRequest:5];
+    [self delayedSubmitInterstitialRequest:5];          // TODO: this should use a constant
 
 }
 
 - (void) createAndLoadMREC {
     
     // Create  banner view
-    bannerView = [ASAdView viewWithPlacementID:bPLC
-                                                   asAdSize:CGSizeMake(300.0f, 250.0f)
-                                                andDelegate:self];
-       
-       bannerView.isPreload = false;
-       bannerView.delegate = self;
-       bannerView.bannerRefreshTimeInterval = 30.0f;
+    bannerView = [ASAdView viewWithPlacementID:bPLC asAdSize:CGSizeMake(300.0f, 250.0f)andDelegate:self];
     
+    // Configure the banner
+    bannerView.isPreload = false;
+    bannerView.delegate = self;
+    bannerView.bannerRefreshTimeInterval = 30.0f;
     
+    // Do banner load on the main queue
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-          
-          NSLog(@"--------- InterstitialVC, delayedSubmitInterstitialRequest now running!");
         
+        NSLog(@"--------- InterstitialVC, delayedSubmitInterstitialRequest now running!");
+        
+        // Load the banner
         [bannerView loadAd];
+        
+        // Add banner to view
         [self.view addSubview:bannerView];
         
     });
@@ -192,41 +220,6 @@
 }
 
 
-- (void) setStartingMetricTime {
-    timeAdReqBegin = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
-    NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqBegin, @" begin tracking time!"];
-    NSLog(@"%@", timeTrackingString);
-}
-
-- (void) setEndMetricTime {
-    timeAdReqEnd = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
-    NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqEnd, @" end tracking time!"];
-    NSLog(@"%@", timeTrackingString);
-}
-
-- (NSString*) returnStartingMetricTime{
-    double formatTimeToUse = (double)timeAdReqBegin;
-    NSString *timeString = [NSString stringWithFormat:@"%f" , formatTimeToUse/1000.0];
-    return timeString;
-}
-
-
-- (NSString*) returnEndMetricTime{
-    double formatTimeToUse = (double)timeAdReqEnd;
-    NSString *timeString = [NSString stringWithFormat:@"%f" , formatTimeToUse/1000.0];
-    return timeString;
-}
-
-
-- (NSString*) calculateTrackingTimeAndReturnValueForSendWithStart:(long long)start WithEnd:(long long) end  {
-    
-    timeElapsed = (end - start);
-    double formatTimeToSend = (double)timeElapsed;
-    NSString *totalTimeString = [NSString stringWithFormat:@"%f" , formatTimeToSend/1000.0];
-    NSLog(@"%@", totalTimeString);
-    
-    return totalTimeString;
-}
 
 
 - (void) delayedSubmitInterstitialRequest:(unsigned long long)time {
@@ -338,81 +331,11 @@
 }
 
 
-
-// IMInterstitialDelegate & GADInterstitialDelegate
-- (void)interstitialDidReceiveAd:(id)interstitial {
-    NSLog(@"--------- InterstitialVC, interstitialDidReceiveAd:");
-    
-
-
-    
-}
-
-// IMInterstitialDelegate
-- (void)interstitialDidFinishLoading:(IMInterstitial*)interstitial {
-    NSLog(@"--------- InterstitialVC, interstitialDidFinishLoading:");
-  
-}
-
-// IMInterstitialDelegate
-- (void)interstitial:(IMInterstitial*)interstitial didFailToLoadWithError:(IMRequestStatus*)error {
-    NSLog(@"--------- InterstitialVC, interstitial:didFailToLoadWithError: - error: %@", error.description);
-
-}
-
-// IMInterstitialDelegate
-- (void)interstitialWillPresent:(IMInterstitial*)interstitial {
-    NSLog(@"--------- InterstitialVC, interstitialWillPresent:");
-
-}
-
-// IMInterstitialDelegate
-- (void)interstitialDidPresent:(IMInterstitial*)interstitial {
-    NSLog(@"--------- InterstitialVC, interstitialDidPresent:");
-}
-
-// IMInterstitialDelegate
-- (void)interstitial:(IMInterstitial*)interstitial didFailToPresentWithError:(IMRequestStatus*)error {
-    NSLog(@"--------- InterstitialVC, interstitial:didFailToPresentWithError: - error: %@", error);
-}
-
-// IMInterstitialDelegate
-- (void)interstitialWillDismiss:(IMInterstitial*)interstitial {
-    NSLog(@"--------- InterstitialVC, interstitialWillDismiss:");
-}
-
-// IMInterstitialDelegate
-- (void)interstitialDidDismiss:(IMInterstitial*)interstitial {
-    NSLog(@"--------- InterstitialVC, interstitialDidDismiss:");
-
-}
-
-// IMInterstitialDelegate
-- (void)interstitial:(IMInterstitial*)interstitial didInteractWithParams:(NSDictionary*)params {
-    NSLog(@"--------- InterstitialVC, interstitial:didInteractWithParams: - params: %@", params);
-}
-
-// IMInterstitialDelegate
-- (void)interstitial:(IMInterstitial*)interstitial rewardActionCompletedWithRewards:(NSDictionary*)rewards {
-    NSLog(@"--------- InterstitialVC, interstitial:rewardActionCompletedWithRewards: - rewards: %@", rewards);
-}
-
-// IMInterstitialDelegate
-- (void)userWillLeaveApplicationFromInterstitial:(IMInterstitial*)interstitial {
-    NSLog(@"--------- InterstitialVC, userWillLeaveApplicationFromInterstitial:");
-}
-
-
-
-
 #pragma mark - ASInterstitialViewControllerDelegate Protocol Methods
 
 - (void)interstitialViewControllerAdFailedToLoad:(ASInterstitialViewController*)viewController withError:(NSError*)error {
+    
     NSLog(@"--------- InterstitialVC, interstitialViewControllerAdFailedToLoad:withError: -- error: %ld", (long)error.code);
-    
-    NSLog(@"--------- InterstitialVC, interstitialViewControllerAdFailedToLoad:withError: -- error:", error);
-    
-    
     
     // We're done with the ad request
     adRequestInProgress = false;
@@ -420,11 +343,12 @@
     // Update # of errors and update view
     [self stat_incrementNumAdErrorsForError:error.code];
     [self view_updateAllStats];
-    
     [self delayedSubmitInterstitialRequest:timeBeforeNextRequest];
+    
 }
 
 - (void)interstitialViewControllerAdLoadedSuccessfully:(ASInterstitialViewController*)viewController {
+    
     NSLog(@"--------- InterstitialVC, interstitialViewControllerAdLoadedSuccessfully");
     [viewController showFromViewController:self];
     
@@ -433,8 +357,8 @@
     
     // Attempt to close the controller after 5 seconds
     [self attemptCloseInterstitialViewAfterTime:globalRequestTimeout forVC:viewController];
+    [self delayedSubmitInterstitialRequest:timeBeforeNextRequest];
     
-     [self delayedSubmitInterstitialRequest:timeBeforeNextRequest];
 }
 
 - (void)interstitialViewControllerDidPreloadAd:(ASInterstitialViewController*)viewController {
@@ -443,8 +367,8 @@
 
 
 - (void)interstitialViewController:(ASInterstitialViewController*)viewController didLoadAdWithTransactionInfo:(NSDictionary*)transactionInfo {
-    NSLog(@"--------- InterstitialVC, interstitialViewController:didLoadAdWithTransactionInfo: - transactionInfo: %@", transactionInfo);
     
+    NSLog(@"--------- InterstitialVC, interstitialViewController:didLoadAdWithTransactionInfo: - transactionInfo: %@", transactionInfo);
     
     // Fire metric and send value
     [self setEndMetricTime];
@@ -465,6 +389,7 @@
 }
 
 - (void)interstitialViewController:(ASInterstitialViewController*)viewController didShowAdWithTransactionInfo:(NSDictionary*)transactionInfo {
+    
     NSLog(@"--------- InterstitialVC, interstitialViewController:didShowAdWithTransactionInfo: - transactionInfo: %@", transactionInfo);
 
     // Auction shown may NOT be the auction winner.
@@ -647,7 +572,7 @@
         numConnectionError++;
         NSLog(@"--------- stat_incrementNumAdErrors for err 11: %li", numConnectionError);
         
-        
+
     }
     
     [self view_updateAllStats];
