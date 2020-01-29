@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "MetricMeasurement.h"
 
 @interface ViewController () <ASInterstitialViewControllerDelegate, ASAdViewDelegate>
 
@@ -15,8 +16,8 @@
 @implementation ViewController
 
 
-    NSMutableData *_responseData;               // Response data from the delegate (not being used)
-    NSString * baseApiURL = @"http://107.170.192.117:8900/api/session/";
+//    NSMutableData *_responseData;               // Response data from the delegate (not being used)
+//    NSString * baseApiURL = @"http://107.170.192.117:8900/api/session/";
 
 
 
@@ -38,15 +39,20 @@
     NSInteger numConnectionError;
     NSInteger numAvgAuctionTime;                // Keep a running total of average auction time (to implement)
     
-    // Timing Tests
-    long long timeAdReqBegin;
-    long long timeAdReqEnd;
-    long long timeElapsed;
-        
+//    // Timing Tests
+//    long long timeAdReqBegin;
+//    long long timeAdReqEnd;
+//    long long timeElapsed;
+    
+    MetricMeasurement* m;
+
+
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    m = [[MetricMeasurement alloc]initWithUID:@"123456789"];
 }
 
 - (IBAction)onTouchBeginTest:(id)sender {
@@ -61,105 +67,76 @@
 
 #pragma mark Metric Section
 
-- (void) setStartingMetricTime {
-    timeAdReqBegin = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
-    NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqBegin, @" begin tracking time!"];
-    NSLog(@"%@", timeTrackingString);
-}
-
-- (void) setEndMetricTime {
-    timeAdReqEnd = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
-    NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqEnd, @" end tracking time!"];
-    NSLog(@"%@", timeTrackingString);
-}
-
-
-- (NSString*) returnStartingMetricTime{
-    double formatTimeToUse = (double)timeAdReqBegin;
-    NSString *timeString = [NSString stringWithFormat:@"%f" , formatTimeToUse/1000.0];
-    return timeString;
-}
-
-
-- (NSString*) returnEndMetricTime{
-    double formatTimeToUse = (double)timeAdReqEnd;
-    NSString *timeString = [NSString stringWithFormat:@"%f" , formatTimeToUse/1000.0];
-    return timeString;
-}
-
-
-- (NSString*) calculateTrackingTimeAndReturnValueForSendWithStart:(long long)start WithEnd:(long long) end  {
-    timeElapsed = (end - start);
-    double formatTimeToSend = (double)timeElapsed;
-    NSString *totalTimeString = [NSString stringWithFormat:@"%f" , formatTimeToSend/1000.0];
-    NSLog(@"%@", totalTimeString);
-    
-    return totalTimeString;
-}
-
-
-- (void) fireMetricWithTime:(NSString* )timeElapsed andStart:(NSString* ) startTime andEnd:(NSString*) endTime forPlacement:(NSString* ) plc{
-
-    NSDictionary *jsonBodyDict = @{
-        @"request_startTime":startTime,
-        @"request_endTime":endTime,
-        @"request_totalTimeElapsed":timeElapsed,
-        @"device_name":@"ios 7+ jason's nice desk",
-        @"device_ip": @"some US IP",
-        @"device_platform":@"iOS",
-        @"ad_request_placement":plc,
-        @"ad_request_geo":@"USA",
-        @"ad_delivery_status": @YES
-    };
-    
-    // Serialize the data in the request
-    NSData *jsonBodyData = [NSJSONSerialization dataWithJSONObject:jsonBodyDict options:kNilOptions error:nil];
-    
-    // Create the request
-    NSURL *url = [NSURL URLWithString:baseApiURL];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    
-    [request setHTTPMethod:@"POST"];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
-    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    [request setHTTPBody: jsonBodyData];
-        
-    // Create url connection and fire request.
-    // TODO: Update this since we're using a deprecated method
-    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-        
-}
-
-
-#pragma mark NSURLConnection Delegate Methods
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    NSLog(@"NSURLConnection didReceiveResponse from: %@", response.URL.absoluteString);
-    _responseData = [[NSMutableData alloc] init];
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    NSLog(@"NSURLConnection didReceiveData with length: %lu", (unsigned long)data.length);
-    [_responseData appendData:data];
-}
+//- (void) setStartingMetricTime {
+//    timeAdReqBegin = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
+//    NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqBegin, @" begin tracking time!"];
+//    NSLog(@"%@", timeTrackingString);
+//}
+//
+//- (void) setEndMetricTime {
+//    timeAdReqEnd = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
+//    NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqEnd, @" end tracking time!"];
+//    NSLog(@"%@", timeTrackingString);
+//}
+//
+//
+//- (NSString*) returnStartingMetricTime{
+//    double formatTimeToUse = (double)timeAdReqBegin;
+//    NSString *timeString = [NSString stringWithFormat:@"%f" , formatTimeToUse/1000.0];
+//    return timeString;
+//}
+//
+//
+//- (NSString*) returnEndMetricTime{
+//    double formatTimeToUse = (double)timeAdReqEnd;
+//    NSString *timeString = [NSString stringWithFormat:@"%f" , formatTimeToUse/1000.0];
+//    return timeString;
+//}
+//
+//
+//- (NSString*) calculateTrackingTimeAndReturnValueForSendWithStart:(long long)start WithEnd:(long long) end  {
+//    timeElapsed = (end - start);
+//    double formatTimeToSend = (double)timeElapsed;
+//    NSString *totalTimeString = [NSString stringWithFormat:@"%f" , formatTimeToSend/1000.0];
+//    NSLog(@"%@", totalTimeString);
+//    
+//    return totalTimeString;
+//}
+//
+//
+//- (void) fireMetricWithTime:(NSString* )timeElapsed andStart:(NSString* ) startTime andEnd:(NSString*) endTime forPlacement:(NSString* ) plc{
+//
+//    NSDictionary *jsonBodyDict = @{
+//        @"request_startTime":startTime,
+//        @"request_endTime":endTime,
+//        @"request_totalTimeElapsed":timeElapsed,
+//        @"device_name":@"ios 7+ jason's nice desk",
+//        @"device_ip": @"some US IP",
+//        @"device_platform":@"iOS",
+//        @"ad_request_placement":plc,
+//        @"ad_request_geo":@"USA",
+//        @"ad_delivery_status": @YES
+//    };
+//    
+//    // Serialize the data in the request
+//    NSData *jsonBodyData = [NSJSONSerialization dataWithJSONObject:jsonBodyDict options:kNilOptions error:nil];
+//    
+//    // Create the request
+//    NSURL *url = [NSURL URLWithString:baseApiURL];
+//    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+//    
+//    [request setHTTPMethod:@"POST"];
+//    [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+//    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+//    [request setHTTPBody: jsonBodyData];
+//        
+//    // Create url connection and fire request.
+//    // TODO: Update this since we're using a deprecated method
+//    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+//        
+//}
 
 
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection
-                  willCacheResponse:(NSCachedURLResponse*)cachedResponse {
-    return nil;
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    // The request is complete and data has been received
-    // You can parse the stuff in your instance variable now
-    NSLog(@"NSURLConnection connectionDidFinishLoading");
-}
-
-
-// TODO: show something if it errors
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error{
-    // The request has failed for some reason! Check the error var
-    }
 
 
 
@@ -213,7 +190,7 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, time * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         
         NSLog(@"--------- InterstitialVC, delayedSubmitInterstitialRequest now running!");
-        [self setStartingMetricTime];
+        [m setStartingMetricTime];
         
         // Load the interstitial VC
         [interVC loadAd];
@@ -353,9 +330,10 @@
     NSLog(@"--------- InterstitialVC, interstitialViewController:didLoadAdWithTransactionInfo: - transactionInfo: %@", transactionInfo);
     
     // Fire metric and send value
-    [self setEndMetricTime];
+    [m setEndMetricTime];
     
-    [self fireMetricWithTime:[self calculateTrackingTimeAndReturnValueForSendWithStart:timeAdReqBegin WithEnd:timeAdReqEnd] andStart:[self returnStartingMetricTime] andEnd:[self returnEndMetricTime] forPlacement:default_int_plc];
+    
+    [m fireMetricWithTime:[m calculateTrackingTimeAndReturnValueForSendWithStart:m.timeAdReqBegin WithEnd:m.timeAdReqEnd] andStart:[m returnStartingMetricTime] andEnd:[m returnEndMetricTime] forPlacement:default_int_plc];
     
     // Update # of ads filled and update view
     

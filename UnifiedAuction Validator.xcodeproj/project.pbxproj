@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9274EB1123E23398008FC112 /* MetricMeasurement.m in Sources */ = {isa = PBXBuildFile; fileRef = 9274EB1023E23398008FC112 /* MetricMeasurement.m */; };
 		9290A33E23934FB20096AF9D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9290A33D23934FB20096AF9D /* AppDelegate.m */; };
 		9290A34423934FB20096AF9D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9290A34323934FB20096AF9D /* ViewController.m */; };
 		9290A34723934FB20096AF9D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9290A34523934FB20096AF9D /* Main.storyboard */; };
@@ -66,6 +67,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		9274EB0F23E23398008FC112 /* MetricMeasurement.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MetricMeasurement.h; sourceTree = "<group>"; };
+		9274EB1023E23398008FC112 /* MetricMeasurement.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetricMeasurement.m; sourceTree = "<group>"; };
 		9290A33923934FB20096AF9D /* UnifiedAuction Validator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "UnifiedAuction Validator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9290A33C23934FB20096AF9D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		9290A33D23934FB20096AF9D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -188,6 +191,8 @@
 				9290A34A23934FB40096AF9D /* LaunchScreen.storyboard */,
 				9290A34D23934FB40096AF9D /* Info.plist */,
 				9290A34E23934FB40096AF9D /* main.m */,
+				9274EB0F23E23398008FC112 /* MetricMeasurement.h */,
+				9274EB1023E23398008FC112 /* MetricMeasurement.m */,
 			);
 			path = "UnifiedAuction Validator";
 			sourceTree = "<group>";
@@ -303,6 +308,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9274EB1123E23398008FC112 /* MetricMeasurement.m in Sources */,
 				9290A34423934FB20096AF9D /* ViewController.m in Sources */,
 				9290A33E23934FB20096AF9D /* AppDelegate.m in Sources */,
 				9290A34F23934FB40096AF9D /* main.m in Sources */,

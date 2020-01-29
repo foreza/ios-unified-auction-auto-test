@@ -14,8 +14,8 @@
             filePath = "UnifiedAuction Validator/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "661"
-            endingLineNumber = "661">
+            startingLineNumber = "639"
+            endingLineNumber = "639">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -28,8 +28,8 @@
             filePath = "UnifiedAuction Validator/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "661"
-            endingLineNumber = "661">
+            startingLineNumber = "639"
+            endingLineNumber = "639">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -42,8 +42,8 @@
             filePath = "UnifiedAuction Validator/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "637"
-            endingLineNumber = "637"
+            startingLineNumber = "615"
+            endingLineNumber = "615"
             landmarkName = "ViewController"
             landmarkType = "3">
          </BreakpointContent>
@@ -58,8 +58,8 @@
             filePath = "UnifiedAuction Validator/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "410"
-            endingLineNumber = "410"
+            startingLineNumber = "388"
+            endingLineNumber = "388"
             landmarkName = "ViewController"
             landmarkType = "3">
          </BreakpointContent>
