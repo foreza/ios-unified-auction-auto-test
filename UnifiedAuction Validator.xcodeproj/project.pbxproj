@@ -109,6 +109,7 @@
 		9290A3832395E9070096AF9D /* GoogleMobileAds.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GoogleMobileAds.framework; path = "UnifiedAuction Validator/MediationFrameworks/GoogleMobileAds.framework"; sourceTree = "<group>"; };
 		9290A3842395E9070096AF9D /* AdColony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdColony.framework; path = "UnifiedAuction Validator/MediationFrameworks/AdColony.framework"; sourceTree = "<group>"; };
 		9290A3852395E9070096AF9D /* FBAudienceNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBAudienceNetwork.framework; path = "UnifiedAuction Validator/MediationFrameworks/FBAudienceNetwork.framework"; sourceTree = "<group>"; };
+		92F63B8C23E22CA80081A15D /* TestConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestConstants.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -177,6 +178,7 @@
 		9290A33B23934FB20096AF9D /* UnifiedAuction Validator */ = {
 			isa = PBXGroup;
 			children = (
+				92F63B8C23E22CA80081A15D /* TestConstants.h */,
 				9290A33C23934FB20096AF9D /* AppDelegate.h */,
 				9290A33D23934FB20096AF9D /* AppDelegate.m */,
 				9290A34223934FB20096AF9D /* ViewController.h */,

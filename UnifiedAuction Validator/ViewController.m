@@ -19,31 +19,16 @@
     NSString * baseApiURL = @"http://107.170.192.117:8900/api/session/";
 
 
-    // Test Variables
 
      ASInterstitialViewController* interVC;          // Interstitial view controller
-
-//    NSString * plc = @"1069520";                   // [Int] SE test placement ID for mirror
-//    NSString * plc = @"1070080";                   // [Int] focus test smaato / dsui adline
-    NSString * plc = @"1067688";                     // [Int] MSFT iOS int placement
-//    NSString * plc = @"380003";                    // [Int] Sample VAST placement ID
-
     ASAdView* bannerView;                           // Banner ad view
-
-    NSString * bPLC = @"1067944";                   // MSFT iOS MREC placement
-
     
-    NSInteger globalRequestTimeout = 5;            // Once this timeout is reached, we'll terminate the request if an impression is not yet fired.
-    NSInteger timeBeforeNextRequest = 35;           // We'll wait this amount of time before firing off another request
-    NSInteger timeForAdOnScreen = 15;               // Amount of time we'll allow an ad to be on screen before we ask for another one.
-
     bool adRequestInProgress = false;               // Track the status of the ad request
     bool hasInterstitialImpression = false;         // Track the impression
     NSString * impressionFromBuyer = @"";           // Track the last known buyer for metrics
 
 
     // Statistics
-
     NSInteger numAdAttempts;                    // Track the number of attempts
     NSInteger numAdFilled;                      // Track the number of attempts
     NSInteger numAdShown;                       // Track the number of attempts
@@ -62,17 +47,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    
-    [self createAndBeginLoadingInterstitial];
-//    [self createAndLoadMREC];
-    
 }
 
 - (IBAction)onTouchBeginTest:(id)sender {
-    
+
      [self createAndBeginLoadingInterstitial];
+    //    [self createAndLoadMREC];
     
-    NSLog(@"--------- InterstitialVC, onTouchBeginTest");
+    NSLog(@"--------- onTouchBeginTest");
     
 }
 
@@ -187,17 +169,17 @@
 - (void) createAndBeginLoadingInterstitial {
     
     // Create ASInterstitial VC
-    interVC = [ASInterstitialViewController viewControllerForPlacementID:plc withDelegate:self];
+    interVC = [ASInterstitialViewController viewControllerForPlacementID:default_int_plc withDelegate:self];
 
     // Load the interstitial 5 seconds later
-    [self delayedSubmitInterstitialRequest:5];          // TODO: this should use a constant
+    [self delayedSubmitInterstitialRequest:initial_request_delay];
 
 }
 
 - (void) createAndLoadMREC {
     
     // Create  banner view
-    bannerView = [ASAdView viewWithPlacementID:bPLC asAdSize:CGSizeMake(300.0f, 250.0f)andDelegate:self];
+    bannerView = [ASAdView viewWithPlacementID:default_mrec_plc asAdSize:CGSizeMake(300.0f, 250.0f)andDelegate:self];
     
     // Configure the banner
     bannerView.isPreload = false;
@@ -242,7 +224,7 @@
         impressionFromBuyer = @"";              // Set to empty string since we don't have a buyer yet
         
         // Begin a timeout for the global request timeout seconds
-        [self attemptTimeoutAfterTime:globalRequestTimeout forVC:interVC];
+        [self attemptTimeoutAfterTime:global_request_timeout forVC:interVC];
         
         // Track the # of attempts
         [self stat_incrementNumAdAttempts];
@@ -265,7 +247,7 @@
             [vc cancel];
             
             // Load another interstitial a couple seconds later, just to be safe.
-            [self delayedSubmitInterstitialRequest:timeBeforeNextRequest];
+            [self delayedSubmitInterstitialRequest:time_before_next_request];
                         
         } else {
             
@@ -343,7 +325,7 @@
     // Update # of errors and update view
     [self stat_incrementNumAdErrorsForError:error.code];
     [self view_updateAllStats];
-    [self delayedSubmitInterstitialRequest:timeBeforeNextRequest];
+    [self delayedSubmitInterstitialRequest:time_before_next_request];
     
 }
 
@@ -356,8 +338,8 @@
        adRequestInProgress = false;
     
     // Attempt to close the controller after 5 seconds
-    [self attemptCloseInterstitialViewAfterTime:globalRequestTimeout forVC:viewController];
-    [self delayedSubmitInterstitialRequest:timeBeforeNextRequest];
+    [self attemptCloseInterstitialViewAfterTime:global_request_timeout forVC:viewController];
+    [self delayedSubmitInterstitialRequest:time_before_next_request];
     
 }
 
@@ -373,7 +355,7 @@
     // Fire metric and send value
     [self setEndMetricTime];
     
-    [self fireMetricWithTime:[self calculateTrackingTimeAndReturnValueForSendWithStart:timeAdReqBegin WithEnd:timeAdReqEnd] andStart:[self returnStartingMetricTime] andEnd:[self returnEndMetricTime] forPlacement:plc];
+    [self fireMetricWithTime:[self calculateTrackingTimeAndReturnValueForSendWithStart:timeAdReqBegin WithEnd:timeAdReqEnd] andStart:[self returnStartingMetricTime] andEnd:[self returnEndMetricTime] forPlacement:default_int_plc];
     
     // Update # of ads filled and update view
     

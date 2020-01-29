@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <InMobiSDK/InMobiSDK.h>
+#import "TestConstants.h"
 
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
