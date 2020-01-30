@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString *testUID;  // Need this for constructor
 
 @property (strong, nonatomic) NSString *base_api_url;
+@property (strong, nonatomic) NSString *ip_service_url;
+
 @property (strong, nonatomic) NSString *device_name;
 @property (strong, nonatomic) NSString *device_ip;
 @property (strong, nonatomic) NSString *device_platform;
@@ -42,7 +44,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) fireMetricWithTime:(NSString* )timeElapsed
                    andStart:(NSString* ) startTime
                      andEnd:(NSString*) endTime
-               forPlacement:(NSString* ) plc;
+               forPlacement:(NSString* ) plc
+                withSuccess:(BOOL) status;
 
 
 

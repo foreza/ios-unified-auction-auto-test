@@ -24,10 +24,31 @@ NSMutableData *_responseData;               // Response data from the delegate (
     if (self) {
         _testUID = testUID;
         _base_api_url = @"http://107.170.192.117:8900/api/session/";    // TODO: find a way to do this better
+        _ip_service_url = @"https://api.ipify.org/"; // TODO: consider using https://ipapi.co/
+        
+        
+        [self retrieveTestIPFromRemoteService];
+        
     }
     return self;
 }
 
+- (void) retrieveTestIPFromRemoteService {
+    
+    
+    // Create the request
+     NSURL *url = [NSURL URLWithString:self.ip_service_url];
+     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+     
+     [request setHTTPMethod:@"GET"];
+     [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+         
+     // Create url connection and fire request.
+     // TODO: Update this since we're using a deprecated method
+     NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    
+}
 
 
 - (void) setStartingMetricTime {
@@ -67,18 +88,18 @@ NSMutableData *_responseData;               // Response data from the delegate (
 }
 
 
-- (void) fireMetricWithTime:(NSString* )timeElapsed andStart:(NSString* ) startTime andEnd:(NSString*) endTime forPlacement:(NSString* ) plc{
+- (void) fireMetricWithTime:(NSString* )timeElapsed andStart:(NSString* ) startTime andEnd:(NSString*) endTime forPlacement:(NSString* ) plc withSuccess:(BOOL)status{
 
     NSDictionary *jsonBodyDict = @{
         @"request_startTime":startTime,
         @"request_endTime":endTime,
         @"request_totalTimeElapsed":timeElapsed,
-        @"device_name":@"ios 7+ jason's nice desk",
-        @"device_ip": @"some US IP",
+        @"device_name":self.testUID,
+        @"device_ip": self.device_ip,
         @"device_platform":@"iOS",
         @"ad_request_placement":plc,
         @"ad_request_geo":@"USA",
-        @"ad_delivery_status": @YES
+        @"ad_delivery_status": [NSNumber numberWithBool:status]
     };
     
     // Serialize the data in the request
@@ -122,7 +143,18 @@ NSMutableData *_responseData;               // Response data from the delegate (
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     // The request is complete and data has been received
     // You can parse the stuff in your instance variable now
-    NSLog(@"NSURLConnection connectionDidFinishLoading");
+
+    
+    if (connection.currentRequest.URL.absoluteString == self.ip_service_url){
+        self.device_ip = [[NSString alloc] initWithData:_responseData encoding:NSUTF8StringEncoding];
+            NSLog(@"Set Metric IP: %@", self.device_ip);
+
+    }
+    
+    NSLog(@"NSURLConnection connectionDidFinishLoading from %@", connection.currentRequest.URL);
+    
+
+    
 }
 
 

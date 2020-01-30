@@ -15,12 +15,6 @@
 
 @implementation ViewController
 
-
-//    NSMutableData *_responseData;               // Response data from the delegate (not being used)
-//    NSString * baseApiURL = @"http://107.170.192.117:8900/api/session/";
-
-
-
      ASInterstitialViewController* interVC;          // Interstitial view controller
     ASAdView* bannerView;                           // Banner ad view
     
@@ -38,21 +32,14 @@
     NSInteger numInternalError;
     NSInteger numConnectionError;
     NSInteger numAvgAuctionTime;                // Keep a running total of average auction time (to implement)
-    
-//    // Timing Tests
-//    long long timeAdReqBegin;
-//    long long timeAdReqEnd;
-//    long long timeElapsed;
+
     
     MetricMeasurement* m;
-
-
-
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    m = [[MetricMeasurement alloc]initWithUID:@"123456789"];
+    m = [[MetricMeasurement alloc]initWithUID:@"jason(personal)Iphone6S-UATest"];
 }
 
 - (IBAction)onTouchBeginTest:(id)sender {
@@ -65,80 +52,6 @@
 }
 
 
-#pragma mark Metric Section
-
-//- (void) setStartingMetricTime {
-//    timeAdReqBegin = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
-//    NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqBegin, @" begin tracking time!"];
-//    NSLog(@"%@", timeTrackingString);
-//}
-//
-//- (void) setEndMetricTime {
-//    timeAdReqEnd = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
-//    NSString *timeTrackingString = [NSString stringWithFormat:@"%lld%@" , timeAdReqEnd, @" end tracking time!"];
-//    NSLog(@"%@", timeTrackingString);
-//}
-//
-//
-//- (NSString*) returnStartingMetricTime{
-//    double formatTimeToUse = (double)timeAdReqBegin;
-//    NSString *timeString = [NSString stringWithFormat:@"%f" , formatTimeToUse/1000.0];
-//    return timeString;
-//}
-//
-//
-//- (NSString*) returnEndMetricTime{
-//    double formatTimeToUse = (double)timeAdReqEnd;
-//    NSString *timeString = [NSString stringWithFormat:@"%f" , formatTimeToUse/1000.0];
-//    return timeString;
-//}
-//
-//
-//- (NSString*) calculateTrackingTimeAndReturnValueForSendWithStart:(long long)start WithEnd:(long long) end  {
-//    timeElapsed = (end - start);
-//    double formatTimeToSend = (double)timeElapsed;
-//    NSString *totalTimeString = [NSString stringWithFormat:@"%f" , formatTimeToSend/1000.0];
-//    NSLog(@"%@", totalTimeString);
-//    
-//    return totalTimeString;
-//}
-//
-//
-//- (void) fireMetricWithTime:(NSString* )timeElapsed andStart:(NSString* ) startTime andEnd:(NSString*) endTime forPlacement:(NSString* ) plc{
-//
-//    NSDictionary *jsonBodyDict = @{
-//        @"request_startTime":startTime,
-//        @"request_endTime":endTime,
-//        @"request_totalTimeElapsed":timeElapsed,
-//        @"device_name":@"ios 7+ jason's nice desk",
-//        @"device_ip": @"some US IP",
-//        @"device_platform":@"iOS",
-//        @"ad_request_placement":plc,
-//        @"ad_request_geo":@"USA",
-//        @"ad_delivery_status": @YES
-//    };
-//    
-//    // Serialize the data in the request
-//    NSData *jsonBodyData = [NSJSONSerialization dataWithJSONObject:jsonBodyDict options:kNilOptions error:nil];
-//    
-//    // Create the request
-//    NSURL *url = [NSURL URLWithString:baseApiURL];
-//    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-//    
-//    [request setHTTPMethod:@"POST"];
-//    [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
-//    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-//    [request setHTTPBody: jsonBodyData];
-//        
-//    // Create url connection and fire request.
-//    // TODO: Update this since we're using a deprecated method
-//    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-//        
-//}
-
-
-
-
 
 #pragma mark Ad Test Control Methods
 
@@ -147,6 +60,7 @@
     
     // Create ASInterstitial VC
     interVC = [ASInterstitialViewController viewControllerForPlacementID:default_int_plc withDelegate:self];
+    interVC.isPreload = true;
 
     // Load the interstitial 5 seconds later
     [self delayedSubmitInterstitialRequest:initial_request_delay];
@@ -296,6 +210,14 @@
     
     NSLog(@"--------- InterstitialVC, interstitialViewControllerAdFailedToLoad:withError: -- error: %ld", (long)error.code);
     
+    // If the ad request was still in flight and now it's over (for the first time), log the metric.
+    if (adRequestInProgress){
+        // Fire metric and send value
+         [m setEndMetricTime];
+         
+         [m fireMetricWithTime:[m calculateTrackingTimeAndReturnValueForSendWithStart:m.timeAdReqBegin WithEnd:m.timeAdReqEnd] andStart:[m returnStartingMetricTime] andEnd:[m returnEndMetricTime] forPlacement:default_int_plc withSuccess: NO];
+    }
+    
     // We're done with the ad request
     adRequestInProgress = false;
         
@@ -304,6 +226,8 @@
     [self view_updateAllStats];
     [self delayedSubmitInterstitialRequest:time_before_next_request];
     
+
+    
 }
 
 - (void)interstitialViewControllerAdLoadedSuccessfully:(ASInterstitialViewController*)viewController {
@@ -311,10 +235,8 @@
     NSLog(@"--------- InterstitialVC, interstitialViewControllerAdLoadedSuccessfully");
     [viewController showFromViewController:self];
     
-    // We're done with the ad request, now we're waterfalling client side
-       adRequestInProgress = false;
     
-    // Attempt to close the controller after 5 seconds
+    // Attempt to close the controller after the delay
     [self attemptCloseInterstitialViewAfterTime:global_request_timeout forVC:viewController];
     [self delayedSubmitInterstitialRequest:time_before_next_request];
     
@@ -322,18 +244,29 @@
 
 - (void)interstitialViewControllerDidPreloadAd:(ASInterstitialViewController*)viewController {
     NSLog(@"--------- InterstitialVC, interstitialViewControllerDidPreloadAd:");
+    
+    // We're done with the ad request, now we're waterfalling client side
+       adRequestInProgress = false;
+    
+    // Fire metric and send value
+     [m setEndMetricTime];
+     
+     
+     [m fireMetricWithTime:[m calculateTrackingTimeAndReturnValueForSendWithStart:m.timeAdReqBegin WithEnd:m.timeAdReqEnd] andStart:[m returnStartingMetricTime] andEnd:[m returnEndMetricTime] forPlacement:default_int_plc withSuccess: YES];
+    
+    
+        [interVC showFromViewController:self];
+    
+    // Attempt to close the controller after the delay
+    [self attemptCloseInterstitialViewAfterTime:global_request_timeout forVC:viewController];
+    [self delayedSubmitInterstitialRequest:time_before_next_request];
+
 }
 
 
 - (void)interstitialViewController:(ASInterstitialViewController*)viewController didLoadAdWithTransactionInfo:(NSDictionary*)transactionInfo {
     
     NSLog(@"--------- InterstitialVC, interstitialViewController:didLoadAdWithTransactionInfo: - transactionInfo: %@", transactionInfo);
-    
-    // Fire metric and send value
-    [m setEndMetricTime];
-    
-    
-    [m fireMetricWithTime:[m calculateTrackingTimeAndReturnValueForSendWithStart:m.timeAdReqBegin WithEnd:m.timeAdReqEnd] andStart:[m returnStartingMetricTime] andEnd:[m returnEndMetricTime] forPlacement:default_int_plc];
     
     // Update # of ads filled and update view
     
